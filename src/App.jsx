@@ -2,13 +2,26 @@
 import { useState } from 'react'
 import './App.scss'
 import Chart from './Chart';
+import readXlsxFile from 'read-excel-file'
 function App() {
  
   const [datosTemporales, setDatosTemporales] = useState({});
   const [chartState, setChartState] = useState(false);
   const [somato, setSomato] = useState([]);
   const [variablesXY, setVariablesXY] = useState([]);
-  
+  const [file, setFile] = useState([]);
+
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      readXlsxFile(e.target.files[0]).then((rows) => {
+        // `rows` is an array of rows
+        // each row being an array of cells.
+        file.push(rows);
+
+      })
+    }
+  };
+
   var data = [
     {"x":variablesXY[0],"y":variablesXY[1]},    // cuadrante Superior Medio Derecho
     // {"x":52,"y":-13},   // cuadrante Inferior Medio Derecho
@@ -85,7 +98,7 @@ const calculateXY = (somato) => {
           <img src='./electron.svg' className='logo electron' alt='Electron + Vite logo' />
         </a>
       </div>
-      <h1>Maurox god</h1>
+      <h1>SomatoChart v2</h1>
       {/* <div className='card'>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -101,6 +114,7 @@ const calculateXY = (somato) => {
        <label htmlFor="" >Sexo</label>
        <select name="" id=""><option value="">Femenino</option> <option value="">Masculino</option></select>
        <h3>Datos antropométricos</h3>
+       <input type="file" onChange={handleFileChange} /> <br />
        <label htmlFor="" >Peso (kg) </label>
        <input type="number" name='Var1' onChange={ (e) => setDatosTemporales({...datosTemporales, Var1: parseFloat(e.target.value)})} /><br />
        <label htmlFor="" >Talla (cm)  </label>
@@ -124,7 +138,7 @@ const calculateXY = (somato) => {
        <button type='submit'>Calcular</button>
        </form>
         {chartState && <Chart  data={data}/>}
-
+        {file && `${file[0]}`}
        <h3>Datos de actividad fisica</h3>
        <label htmlFor="" >Deporte</label>
        <input type="text" /><br />
