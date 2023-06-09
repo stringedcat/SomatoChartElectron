@@ -10,15 +10,51 @@ function App() {
   const [variablesXY, setVariablesXY] = useState([]);
   const [file, setFile] = useState(initialState);
   const [renderDatos, setRenderDatos] = useState(false);
+  const indiceDeColumnas = [];
 
+  const datosAntropometricos = [
+    "Peso (kg)",
+    "Talla (cm)",
+    "Perímetro brazo (cm)",
+    "Perímetro de pierna (cm)",
+    "Diámetro humeral (cm)",
+    "Diámetro femoral (cm)",
+    "Pliegue tricipital (mm)",
+    "Pliegue subescapular (mm)",
+    "Pliegue suprailíaco (mm)",
+    "Pliegue de pierna (mm)",
+  ];
+
+  const handleSelected = (element) => {
+    console.log(element.target.value, "valor actual");
+    let optionSelected = String.toString(element.target.value);
+
+    if (indiceDeColumnas.length >= 1) {
+      if (indiceDeColumnas.find((e) => e.value === element.target.value) === -1) {
+        let indiceTemporal = file[0].findIndex((e) => e === element.target.value);
+        indiceDeColumnas.push({indice : indiceTemporal, value: element.target.value});
+        console.log(indiceDeColumnas, "indices segundos");
+      } else {
+        console.log("dato repetido wacho");
+      }
+
+      return;
+    }
+    let indiceTemporal = file[0].findIndex((e) => e === element.target.value);
+    console.log(indiceTemporal, "indice primero");
+    indiceDeColumnas.push({indice : indiceTemporal, value: element.target.value});
+
+    console.log(indiceDeColumnas);
+  };
   const handleFileChange = (e) => {
     if (e.target.files) {
       readXlsxFile(e.target.files[0]).then((rows) => {
         // `rows` is an array of rows
         // each row being an array of cells.
         setFile(rows);
+
+        setRenderDatos(true);
       });
-      setRenderDatos(true);
     }
   };
 
@@ -160,9 +196,17 @@ function App() {
         <input type="file" onChange={handleFileChange} /> <br />
         {renderDatos ? (
           <>
-            <label htmlFor="">Peso (kg) </label>
-   <select>{file[0].map(e =><option>{e}</option>)}</select>
-
+            {datosAntropometricos.map((colummnas) => (
+              <>
+                <label htmlFor="">{colummnas}</label>
+                <select onChange={handleSelected}>
+                  {file[0].map((columnaDropdown,i) => (
+                    <option key={i} value={columnaDropdown}>{columnaDropdown}</option>
+                  ))}
+                </select>{" "}
+                <br />
+              </>
+            ))}
           </>
         ) : (
           <>
@@ -292,7 +336,6 @@ function App() {
         )}
       </form>
       {chartState && <Chart data={data} />}
-      {file && `${file[0]}`}
       <h3>Datos de actividad fisica</h3>
       <label htmlFor="">Deporte</label>
       <input type="text" />
